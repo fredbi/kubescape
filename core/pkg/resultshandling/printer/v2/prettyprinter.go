@@ -220,10 +220,14 @@ func (pp *PrettyPrinter) printSummaryTable(summaryDetails *reportsummary.Summary
 	cautils.InfoTextDisplay(pp.writer, renderSeverityCountersSummary(summaryDetails.GetResourcesSeverityCounters())+"\n\n")
 
 	// cautils.InfoTextDisplay(prettyPrinter.writer, "\n"+"Severities: SOME OTHER"+"\n\n")
+<<<<<<< HEAD
 
 	summaryTable := tablewriter.NewWriter(pp.writer)
 	summaryTable.SetAutoWrapText(false)
 	summaryTable.SetHeader(getControlTableHeaders())
+=======
+	summaryTable := tablewriter.NewWriter(prettyPrinter.writer)
+>>>>>>> temp work
 	summaryTable.SetHeaderLine(true)
 	summaryTable.SetColumnAlignment(getColumnsAlignments())
 
@@ -233,16 +237,28 @@ func (pp *PrettyPrinter) printSummaryTable(summaryDetails *reportsummary.Summary
 		printAll = true
 	}
 
+	// TODO(fred): resolve conflicts
 	infoToPrintInfo := mapInfoToPrintInfo(summaryDetails.Controls)
+<<<<<<< HEAD
 	for i := len(sortedControlIDs) - 1; i >= 0; i-- {
 		for _, c := range sortedControlIDs[i] {
 			row := generateRow(summaryDetails.Controls.GetControl(reportsummary.EControlCriteriaID, c), infoToPrintInfo, printAll)
+=======
+	lines := make([][]string, 0, 100)
+	lines = append(lines, getControlTableHeaders())
+	for i := len(sortedControlNames) - 1; i >= 0; i-- {
+		for _, c := range sortedControlNames[i] {
+			row := generateRow(summaryDetails.Controls.GetControl(reportsummary.EControlCriteriaName, c), infoToPrintInfo, printAll)
+>>>>>>> temp work
 			if len(row) > 0 {
-				summaryTable.Append(row)
+				lines = append(lines, row)
 			}
 		}
 	}
 
+	ensureTableLayout(summaryTable, _rowLen, lines)
+	summaryTable.SetHeader(getControlTableHeaders())
+	summaryTable.AppendBulk(lines[1:])
 	summaryTable.SetFooter(generateFooter(summaryDetails))
 
 	summaryTable.Render()

@@ -20,7 +20,6 @@ const (
 )
 
 func (prettyPrinter *PrettyPrinter) resourceTable(opaSessionObj *cautils.OPASessionObj) {
-
 	for resourceID, result := range opaSessionObj.ResourcesResult {
 		if !result.GetStatus(nil).IsFailed() {
 			continue
@@ -43,9 +42,7 @@ func (prettyPrinter *PrettyPrinter) resourceTable(opaSessionObj *cautils.OPASess
 		fmt.Fprintf(prettyPrinter.writer, "\n"+controlCountersForResource(result.ListControlsIDs(nil))+"\n\n")
 
 		summaryTable := tablewriter.NewWriter(prettyPrinter.writer)
-		summaryTable.SetAutoWrapText(true)
 		summaryTable.SetAutoMergeCells(true)
-		summaryTable.SetHeader(generateResourceHeader())
 		summaryTable.SetHeaderLine(true)
 		summaryTable.SetRowLine(true)
 		data := Matrix{}
@@ -56,6 +53,9 @@ func (prettyPrinter *PrettyPrinter) resourceTable(opaSessionObj *cautils.OPASess
 		// For control scan framework will be nil
 
 		sort.Sort(data)
+		headings := generateResourceHeader()
+		ensureTableLayout(summaryTable, _resourceRowLen, append(data, headings))
+		summaryTable.SetHeader(headings)
 		summaryTable.AppendBulk(data)
 
 		summaryTable.Render()

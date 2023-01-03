@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"time"
 
+	gitv5 "github.com/go-git/go-git/v5"
+	configv5 "github.com/go-git/go-git/v5/config"
+	plumbingv5 "github.com/go-git/go-git/v5/plumbing"
 	"github.com/kubescape/go-git-url/apis"
 	git2go "github.com/libgit2/git2go/v33"
 )
@@ -23,6 +26,9 @@ func newGitRepository(root string) (*gitRepository, error) {
 	return &gitRepository{
 		git2GoRepo: git2GoRepo,
 	}, nil
+}
+
+func (g *gitRepository) Init(repo *gitv5.Repository, head *plumbingv5.Reference, config *configv5.Config) {
 }
 
 func (g *gitRepository) GetFileLastCommit(filePath string) (*apis.Commit, error) {

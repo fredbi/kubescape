@@ -23,9 +23,17 @@ var ErrWarnNotSupportedByBuild = errors.New(`git commits retrieval not supported
 
 func NewLocalGitRepository(path string) (*LocalGitRepository, error) {
 	goGitRepo, err := gitv5.PlainOpenWithOptions(path, &gitv5.PlainOpenOptions{DetectDotGit: true})
-	if err != nil {
-		return nil, err
-	}
+	/*
+		storage := memory.NewStorage()
+		_, wt, err := dotGitToOSFilesystems(path, true)
+		if err != nil {
+			return nil, err
+		}
+		goGitRepo, err := gitv5.Open(storage, wt)
+		if err != nil {
+			return nil, err
+		}
+	*/
 
 	head, err := goGitRepo.Head()
 	if err != nil {
@@ -58,6 +66,8 @@ func NewLocalGitRepository(path string) (*LocalGitRepository, error) {
 		}
 
 		l.gitRepository = gitRepository
+
+		gitRepository.Init(goGitRepo, head, config)
 	}
 
 	return l, nil
@@ -106,13 +116,11 @@ func (g *LocalGitRepository) GetName() (string, error) {
 
 // GetLastCommit get latest commit object
 func (g *LocalGitRepository) GetLastCommit() (*apis.Commit, error) {
-	cIter, err := g.goGitRepo.Log(&gitv5.LogOptions{})
+	ref, err := g.goGitRepo.Head()
 	if err != nil {
 		return nil, err
 	}
-
-	commit, err := cIter.Next()
-	defer cIter.Close()
+	commit, err := g.goGitRepo.CommitObject(ref.Hash())
 	if err != nil {
 		return nil, err
 	}

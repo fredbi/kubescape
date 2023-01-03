@@ -1,4 +1,4 @@
-//go:build gitenabled
+//Xgo:build gitenabled
 package cautils
 
 func (s *LocalGitRepositoryTestSuite) TestGetLastCommit() {

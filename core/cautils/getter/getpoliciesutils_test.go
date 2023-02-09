@@ -1,10 +1,12 @@
 package getter
 
 import (
+	"net/http"
 	"os"
 	"path/filepath"
 	"testing"
 
+	jsoniter "github.com/json-iterator/go"
 	"github.com/stretchr/testify/require"
 )
 
@@ -39,7 +41,7 @@ func TestSaveInFile(t *testing.T) {
 		buf, err := os.ReadFile(target)
 		require.NoError(t, err)
 		var retrieved interface{}
-		require.NoError(t, json.Unmarshal(buf, &retrieved))
+		require.NoError(t, jsoniter.Unmarshal(buf, &retrieved))
 
 		require.EqualValues(t, policy, retrieved)
 	})
@@ -51,7 +53,7 @@ func TestSaveInFile(t *testing.T) {
 		buf, err := os.ReadFile(target)
 		require.NoError(t, err)
 		var retrieved interface{}
-		require.NoError(t, json.Unmarshal(buf, &retrieved))
+		require.NoError(t, jsoniter.Unmarshal(buf, &retrieved))
 
 		require.EqualValues(t, policy, retrieved)
 	})
@@ -64,5 +66,33 @@ func TestSaveInFile(t *testing.T) {
 		}
 		target := filepath.Join(dir, "error.json")
 		require.Error(t, SaveInFile(badPolicy, target))
+	})
+}
+
+func TestHttpMethods(t *testing.T) {
+	client := http.DefaultClient
+	hdrs := map[string]string{"key": "value"}
+
+	srv := mockAPIServer(t)
+	t.Cleanup(srv.Close)
+
+	t.Run("HttpGetter should GET", func(t *testing.T) {
+		resp, err := HttpGetter(client, srv.URL(pathTestGet), hdrs)
+		require.NoError(t, err)
+		require.EqualValues(t, "body-get", resp)
+	})
+
+	t.Run("HttpPost should POST", func(t *testing.T) {
+		body := []byte("body-post")
+
+		resp, err := HttpPost(client, srv.URL(pathTestPost), hdrs, body)
+		require.NoError(t, err)
+		require.EqualValues(t, string(body), resp)
+	})
+
+	t.Run("HttpDelete should DELETE", func(t *testing.T) {
+		resp, err := HttpDelete(client, srv.URL(pathTestDelete), hdrs)
+		require.NoError(t, err)
+		require.EqualValues(t, "body-delete", resp)
 	})
 }

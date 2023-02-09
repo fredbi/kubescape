@@ -263,8 +263,8 @@ func mockCustomerConfig(cluster, scope string) func() *armotypes.CustomerConfig 
 	}
 }
 
-func mockLoginResponse() *FeLoginResponse {
-	return &FeLoginResponse{
+func mockLoginResponse() *feLoginResponse {
+	return &feLoginResponse{
 		Token:        "access-token",
 		RefreshToken: "refresh-token",
 		Expires:      "expiry-time",

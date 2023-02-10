@@ -19,8 +19,8 @@ func TestReportEventReceiver_addPathURL(t *testing.T) {
 		{
 			name: "add scan path",
 			report: &ReportEventReceiver{
-				clusterName:        "test",
-				customerGUID:       "FFFF",
+				clusterName: "test",
+				// customerGUID:       "FFFF", // TODO(fred)
 				token:              "XXXX",
 				customerAdminEMail: "test@test",
 				reportID:           "1234",

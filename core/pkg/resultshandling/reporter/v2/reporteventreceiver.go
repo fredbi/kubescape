@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"net/http"
 	"net/url"
 	"os"
 
@@ -32,11 +31,10 @@ const (
 )
 
 type ReportEventReceiver struct {
-	httpClient         *http.Client
+	*getter.KSCloudAPI
 	clusterName        string
-	customerGUID       string
-	eventReceiverURL   *url.URL
-	token              string
+	eventReceiverURL   *url.URL // ???
+	token              string   // TODO: which token?
 	customerAdminEMail string
 	message            string
 	reportID           string
@@ -44,21 +42,28 @@ type ReportEventReceiver struct {
 }
 
 func NewReportEventReceiver(tenantConfig *cautils.ConfigObj, reportID string, submitContext SubmitContext) *ReportEventReceiver {
-	return &ReportEventReceiver{
-		httpClient:         &http.Client{},
-		clusterName:        tenantConfig.ClusterName,
-		customerGUID:       tenantConfig.AccountID,
+	report := &ReportEventReceiver{
+		KSCloudAPI: getter.GetKSCloudAPIConnector(),
+		//httpClient:         &http.Client{},
+		clusterName: tenantConfig.ClusterName,
+		// customerGUID:       tenantConfig.AccountID,
 		token:              tenantConfig.Token,
 		customerAdminEMail: tenantConfig.CustomerAdminEMail,
 		reportID:           reportID,
 		submitContext:      submitContext,
 	}
+
+	report.SetAccountID(tenantConfig.AccountID)
+	report.SetSecretKey(tenantConfig.Token) // TODO(fred): should we do that?
+
+	return report
 }
 
 func (report *ReportEventReceiver) Submit(ctx context.Context, opaSessionObj *cautils.OPASessionObj) error {
 	ctx, span := otel.Tracer("").Start(ctx, "reportEventReceiver.Submit")
 	defer span.End()
-	if report.customerGUID == "" {
+	guid := report.GetAccountID()
+	if guid == "" {
 		logger.L().Ctx(ctx).Warning("failed to publish results. Reason: Unknown accout ID. Run kubescape with the '--account <account ID>' flag. Contact ARMO team for more details")
 		return nil
 	}
@@ -74,13 +79,13 @@ func (report *ReportEventReceiver) Submit(ctx context.Context, opaSessionObj *ca
 		err = fmt.Errorf("failed to submit scan results. url: '%s', reason: %s", report.GetURL(), err.Error())
 	}
 
-	logger.L().Debug("", helpers.String("account ID", report.customerGUID))
+	logger.L().Debug("", helpers.String("account ID", guid))
 
 	return err
 }
 
 func (report *ReportEventReceiver) SetCustomerGUID(customerGUID string) {
-	report.customerGUID = customerGUID
+	report.SetAccountID(customerGUID)
 }
 
 func (report *ReportEventReceiver) SetClusterName(clusterName string) {
@@ -116,7 +121,7 @@ func (report *ReportEventReceiver) prepareReport(opaSessionObj *cautils.OPASessi
 
 func (report *ReportEventReceiver) GetURL() string {
 	u := url.URL{}
-	u.Host = getter.GetKSCloudAPIConnector().GetCloudUIURL()
+	u.Host = report.GetCloudUIURL() // TODO(fred): UI vs report URL???
 
 	parseHost(&u)
 	report.addPathURL(&u)
@@ -243,7 +248,8 @@ func (report *ReportEventReceiver) sendReport(host string, postureReport *report
 	if err != nil {
 		return fmt.Errorf("in 'sendReport' failed to json.Marshal, reason: %v", err)
 	}
-	msg, err := getter.HttpPost(report.httpClient, host, nil, reqBody)
+	//msg, err := getter.HttpPost(report.httpClient, host, nil, reqBody)
+	msg, err := report.Post(host, nil, reqBody) // TODO
 	if err != nil {
 		return fmt.Errorf("%s, %v:%s", host, err, msg)
 	}
@@ -285,7 +291,7 @@ func (report *ReportEventReceiver) addPathURL(urlObj *url.URL) {
 
 	q := urlObj.Query()
 	q.Add("invitationToken", report.token)
-	q.Add("customerGUID", report.customerGUID)
+	q.Add("customerGUID", report.GetAccountID())
 	urlObj.RawQuery = q.Encode()
 
 }

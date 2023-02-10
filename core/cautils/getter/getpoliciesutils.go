@@ -1,7 +1,6 @@
 package getter
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"net/http"
@@ -43,28 +42,6 @@ func SaveInFile(object interface{}, targetFile string) error {
 	return nil
 }
 
-// HttpDelete provides a low-level capability to send a HTTP DELETE request and serialize the response as a string.
-//
-// Deprecated: use methods of the KSCloudAPI client instead.
-func HttpDelete(httpClient *http.Client, fullURL string, headers map[string]string) (string, error) {
-
-	req, err := http.NewRequest("DELETE", fullURL, nil)
-	if err != nil {
-		return "", err
-	}
-	setHeaders(req, headers)
-
-	resp, err := httpClient.Do(req)
-	if err != nil {
-		return "", err
-	}
-	respStr, err := httpRespToString(resp)
-	if err != nil {
-		return "", err
-	}
-	return respStr, nil
-}
-
 // HttpGetter provides a low-level capability to send a HTTP GET request and serialize the response as a string.
 //
 // Deprecated: use methods of the KSCloudAPI client instead.
@@ -75,26 +52,6 @@ func HttpGetter(httpClient *http.Client, fullURL string, headers map[string]stri
 	}
 	setHeaders(req, headers)
 
-	resp, err := httpClient.Do(req)
-	if err != nil {
-		return "", err
-	}
-	respStr, err := httpRespToString(resp)
-	if err != nil {
-		return "", err
-	}
-	return respStr, nil
-}
-
-// HttpPost provides a low-level capability to send a HTTP POST request and serialize the response as a string.
-//
-// Deprecated: use methods of the KSCloudAPI client instead.
-func HttpPost(httpClient *http.Client, fullURL string, headers map[string]string, body []byte) (string, error) {
-	req, err := http.NewRequest("POST", fullURL, bytes.NewReader(body))
-	if err != nil {
-		return "", err
-	}
-	setHeaders(req, headers)
 	resp, err := httpClient.Do(req)
 	if err != nil {
 		return "", err

@@ -225,6 +225,7 @@ func (api *KSCloudAPI) Delete(fullURL string, headers map[string]string) (string
 	return readString(rdr, size)
 }
 
+// GetAccountID returns the customer account's GUID.
 func (api *KSCloudAPI) GetAccountID() string      { return api.accountID }
 func (api *KSCloudAPI) IsLoggedIn() bool          { return api.loggedIn }
 func (api *KSCloudAPI) GetClientID() string       { return api.clientID }

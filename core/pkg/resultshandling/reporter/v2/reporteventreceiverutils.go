@@ -5,18 +5,17 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/kubescape/kubescape/v2/core/cautils"
-	"github.com/kubescape/kubescape/v2/core/cautils/getter"
 	reporthandlingv2 "github.com/kubescape/opa-utils/reporthandling/v2"
 )
 
 func (report *ReportEventReceiver) initEventReceiverURL() {
 	urlObj := url.URL{}
-	urlObj.Host = getter.GetKSCloudAPIConnector().GetCloudReportURL()
+	urlObj.Host = report.GetCloudReportURL()
 	parseHost(&urlObj)
 
 	urlObj.Path = "/k8s/v2/postureReport"
 	q := urlObj.Query()
-	q.Add("customerGUID", uuid.MustParse(report.customerGUID).String())
+	q.Add("customerGUID", uuid.MustParse(report.GetAccountID()).String()) // TODO(fred): should not use must
 	q.Add("contextName", report.clusterName)
 	q.Add("clusterName", report.clusterName) // deprecated
 
@@ -34,7 +33,7 @@ func hostToString(host *url.URL, reportID string) string {
 
 func (report *ReportEventReceiver) setSubReport(opaSessionObj *cautils.OPASessionObj) *reporthandlingv2.PostureReport {
 	reportObj := &reporthandlingv2.PostureReport{
-		CustomerGUID:         report.customerGUID,
+		CustomerGUID:         report.GetAccountID(),
 		ClusterName:          report.clusterName,
 		ReportID:             report.reportID,
 		ReportGenerationTime: opaSessionObj.Report.ReportGenerationTime,

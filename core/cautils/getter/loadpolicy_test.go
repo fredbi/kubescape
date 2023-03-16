@@ -345,6 +345,18 @@ func TestLoadPolicy(t *testing.T) {
 			_, err := p.GetControlsInputs(cluster)
 			require.Error(t, err)
 		})
+
+		t.Run("should return control inputs (bug #1125)", func(t *testing.T) {
+			t.Parallel()
+
+			const exceptions = "controls-inputs-1125"
+
+			p := NewLoadPolicy([]string{testFrameworkFile(exceptions)})
+			inputs, err := p.GetControlsInputs("")
+			require.NoError(t, err)
+
+			require.Equal(t, 23, len(inputs))
+		})
 	})
 
 	t.Run("with GetExceptions", func(t *testing.T) {
@@ -382,6 +394,21 @@ func TestLoadPolicy(t *testing.T) {
 			p := NewLoadPolicy([]string{testFrameworkFile(invalidInputs)})
 			_, err := p.GetExceptions(cluster)
 			require.Error(t, err)
+		})
+
+		t.Run("should return exceptions (bug #1125)", func(t *testing.T) {
+			t.Parallel()
+
+			const exceptions = "exceptions-1125"
+
+			p := NewLoadPolicy([]string{testFrameworkFile(exceptions)})
+			exceptionPolicies, err := p.GetExceptions(cluster)
+			require.NoError(t, err)
+
+			require.Equal(t, 11, len(exceptionPolicies))
+			for _, policy := range exceptionPolicies {
+				require.NotEmpty(t, policy.Name)
+			}
 		})
 	})
 }

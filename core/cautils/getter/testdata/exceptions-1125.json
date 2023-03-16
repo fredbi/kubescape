@@ -1,0 +1,222 @@
+[
+    {
+    "name": "my-framework-exceptions",
+    "policyType": "postureExceptionPolicy",
+        "actions": [
+            "alertOnly"
+        ],
+    "resources": [
+        {
+            "designatorType": "Attributes",
+            "attributes": {
+                "labels": ".*"
+            }
+        }
+    ],
+    "posturePolicies": [
+        {
+            "frameworkName": "cis-eks-t1.2.0"
+        }
+    ]
+    },
+    {
+        "name": "my-framework-exception-0004",
+        "policyType": "postureExceptionPolicy",
+        "actions": [
+            "alertOnly"
+        ],
+        "resources": [
+                {
+                    "designatorType": "Attributes",
+                    "attributes": {
+                        "labels": ".*"
+                    }
+                }
+        ],
+        "posturePolicies": [
+            {
+                "controlID": "C-0004"
+            }
+        ]
+    },
+    {
+        "name": "my-framework-exception-0012",
+        "policyType": "postureExceptionPolicy",
+        "actions": [
+            "alertOnly"
+        ],
+        "resources": [
+                {
+                    "designatorType": "Attributes",
+                    "attributes": {
+                        "labels": ".*"
+                    }
+                }
+        ],
+        "posturePolicies": [
+            {
+                "controlID": "C-0012"
+            }
+        ]
+    },
+    {
+        "name": "my-framework-exception-0055",
+        "policyType": "postureExceptionPolicy",
+        "actions": [
+            "alertOnly"
+        ],
+        "resources": [
+                {
+                    "designatorType": "Attributes",
+                    "attributes": {
+                        "labels": ".*"
+                    }
+                }
+        ],
+        "posturePolicies": [
+            {
+                "controlID": "C-0055"
+            }
+        ]
+    },
+    {
+        "name": "my-framework-exception-0076",
+        "policyType": "postureExceptionPolicy",
+        "actions": [
+            "alertOnly"
+        ],
+        "resources": [
+                {
+                    "designatorType": "Attributes",
+                    "attributes": {
+                        "labels": ".*"
+                    }
+                }
+        ],
+        "posturePolicies": [
+            {
+                "controlID": "C-0076"
+            }
+        ]
+    },
+    {
+        "name": "my-framework-exception-0193",
+        "policyType": "postureExceptionPolicy",
+        "actions": [
+            "alertOnly"
+        ],
+        "resources": [
+                {
+                    "designatorType": "Attributes",
+                    "attributes": {
+                        "labels": ".*"
+                    }
+                }
+        ],
+        "posturePolicies": [
+            {
+                "controlID": "C-0193"
+            }
+        ]
+    },
+    {
+        "name": "my-framework-exception-0202",
+        "policyType": "postureExceptionPolicy",
+        "actions": [
+            "alertOnly"
+        ],
+        "resources": [
+                {
+                    "designatorType": "Attributes",
+                    "attributes": {
+                        "labels": ".*"
+                    }
+                }
+        ],
+        "posturePolicies": [
+            {
+                "controlID": "C-0202"
+            }
+        ]
+    },
+    {
+        "name": "my-framework-exception-0211",
+        "policyType": "postureExceptionPolicy",
+        "actions": [
+            "disable"
+        ],
+        "resources": [
+                {
+                    "designatorType": "Attributes",
+                    "attributes": {
+                        "labels": ".*"
+                    }
+                }
+        ],
+        "posturePolicies": [
+            {
+                "controlID": "C-0211"
+            }
+        ]
+    },
+    {
+        "name": "my-framework-exception-0225",
+        "policyType": "postureExceptionPolicy",
+        "actions": [
+            "alertOnly"
+        ],
+        "resources": [
+                {
+                    "designatorType": "Attributes",
+                    "attributes": {
+                        "labels": ".*"
+                    }
+                }
+        ],
+        "posturePolicies": [
+            {
+                "controlID": "C-0225"
+            }
+        ]
+    },
+    {
+        "name": "my-framework-exception-0236",
+        "policyType": "postureExceptionPolicy",
+        "actions": [
+            "alertOnly"
+        ],
+        "resources": [
+                {
+                    "designatorType": "Attributes",
+                    "attributes": {
+                        "labels": ".*"
+                    }
+                }
+        ],
+        "posturePolicies": [
+            {
+                "controlID": "C-0236"
+            }
+        ]
+    },
+    {
+        "name": "my-framework-exception-0237",
+        "policyType": "postureExceptionPolicy",
+        "actions": [
+            "alertOnly"
+        ],
+        "resources": [
+                {
+                    "designatorType": "Attributes",
+                    "attributes": {
+                        "labels": ".*"
+                    }
+                }
+        ],
+        "posturePolicies": [
+            {
+                "controlID": "C-0237"
+            }
+        ]
+    }
+]

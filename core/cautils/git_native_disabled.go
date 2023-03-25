@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 
 	"os"
 	"path/filepath"
@@ -216,8 +217,10 @@ func dotGitFileToOSFilesystem(path string, fs billy.Filesystem) (bfs billy.Files
 	gitdir := strings.Split(line[len(prefix):], "\n")[0]
 	gitdir = strings.TrimSpace(gitdir)
 	if filepath.IsAbs(gitdir) {
+		log.Printf("DEBUG(1): dotGit: %s", gitdir)
 		return osfs.New(gitdir), nil
 	}
 
+	log.Printf("DEBUG(2): dotGit: %s/%s", path, gitdir)
 	return osfs.New(fs.Join(path, gitdir)), nil
 }

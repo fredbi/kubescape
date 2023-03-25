@@ -6,9 +6,15 @@ import (
 	"path"
 	"strings"
 
+	"github.com/go-git/go-billy/v5/osfs"
 	gitv5 "github.com/go-git/go-git/v5"
 	configv5 "github.com/go-git/go-git/v5/config"
 	plumbingv5 "github.com/go-git/go-git/v5/plumbing"
+	"github.com/go-git/go-git/v5/plumbing/cache"
+
+	// "github.com/go-git/go-git/v5/go-billy/memfs"
+	// "github.com/go-git/go-git/v5/storage/memory"
+	"github.com/go-git/go-git/v5/storage/filesystem"
 	"github.com/kubescape/go-git-url/apis"
 )
 
@@ -22,18 +28,21 @@ type LocalGitRepository struct {
 var ErrWarnNotSupportedByBuild = errors.New(`git commits retrieval not supported by this build. Build with tag "gitenabled" to enable the full git scan feature`)
 
 func NewLocalGitRepository(path string) (*LocalGitRepository, error) {
-	goGitRepo, err := gitv5.PlainOpenWithOptions(path, &gitv5.PlainOpenOptions{DetectDotGit: true})
-	/*
-		storage := memory.NewStorage()
-		_, wt, err := dotGitToOSFilesystems(path, true)
-		if err != nil {
-			return nil, err
-		}
-		goGitRepo, err := gitv5.Open(storage, wt)
-		if err != nil {
-			return nil, err
-		}
-	*/
+	// goGitRepo, err := gitv5.PlainOpenWithOptions(path, &gitv5.PlainOpenOptions{DetectDotGit: true})
+
+	// storage := memory.NewStorage()
+	storage := filesystem.NewStorage(
+		osfs.New(path),
+		cache.NewObjectLRUDefault(), // 96MB
+	)
+	_, wt, err := dotGitToOSFilesystems(path, true)
+	if err != nil {
+		return nil, fmt.Errorf("cannot open git repo on local FS: %w", err)
+	}
+	goGitRepo, err := gitv5.Open(storage, wt)
+	if err != nil {
+		return nil, fmt.Errorf("cannot open git repo: %w", err)
+	}
 
 	head, err := goGitRepo.Head()
 	if err != nil {

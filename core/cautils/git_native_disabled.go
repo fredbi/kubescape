@@ -143,7 +143,7 @@ const gitDirName = ".git"
 
 func dotGitToOSFilesystems(path string, detect bool) (dot, wt billy.Filesystem, err error) {
 	if path, err = filepath.Abs(path); err != nil {
-		return nil, nil, err
+		return nil, nil, fmt.Errorf("invalid path %q: %w", path, err)
 	}
 
 	var fs billy.Filesystem
@@ -154,7 +154,7 @@ func dotGitToOSFilesystems(path string, detect bool) (dot, wt billy.Filesystem, 
 		pathinfo, err := fs.Stat("/")
 		if !os.IsNotExist(err) {
 			if pathinfo == nil {
-				return nil, nil, err
+				return nil, nil, fmt.Errorf("cannot stat root: %w", err)
 			}
 			if !pathinfo.IsDir() && detect {
 				fs = osfs.New(filepath.Dir(path))
@@ -168,13 +168,14 @@ func dotGitToOSFilesystems(path string, detect bool) (dot, wt billy.Filesystem, 
 		}
 		if !os.IsNotExist(err) {
 			// unknown error; stop
-			return nil, nil, err
+			return nil, nil, fmt.Errorf("cannot stat %q: %w", gitDirName, err)
 		}
 		if detect {
 			// try its parent as long as we haven't reached
 			// the root dir
 			if dir := filepath.Dir(path); dir != path {
 				path = dir
+
 				continue
 			}
 		}
@@ -185,7 +186,11 @@ func dotGitToOSFilesystems(path string, detect bool) (dot, wt billy.Filesystem, 
 
 	if fi.IsDir() {
 		dot, err = fs.Chroot(gitDirName)
-		return dot, fs, err
+		if err != nil {
+			return dot, fs, fmt.Errorf("cannot chroot to %q: %w", gitDirName, err)
+		}
+
+		return dot, fs, nil
 	}
 
 	dot, err = dotGitFileToOSFilesystem(path, fs)
@@ -199,13 +204,13 @@ func dotGitToOSFilesystems(path string, detect bool) (dot, wt billy.Filesystem, 
 func dotGitFileToOSFilesystem(path string, fs billy.Filesystem) (bfs billy.Filesystem, err error) {
 	f, err := fs.Open(gitDirName)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cannot open %q: %w", gitDirName, err)
 	}
 	defer ioutil.CheckClose(f, &err)
 
 	b, err := io.ReadAll(f)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cannot read %q: %w", gitDirName, err)
 	}
 
 	line := string(b)

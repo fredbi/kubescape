@@ -2,6 +2,8 @@ module github.com/kubescape/kubescape/v2
 
 go 1.19
 
+replace github.com/go-git/go-git/v5 => /home/fred/src/github.com/fredbi/go-git
+
 require (
 	cloud.google.com/go/containeranalysis v0.6.0
 	github.com/armosec/armoapi-go v0.0.173
@@ -30,6 +32,7 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/open-policy-agent/opa v0.45.0
 	github.com/owenrumney/go-sarif/v2 v2.1.2
+	github.com/pkg/profile v1.2.1
 	github.com/schollz/progressbar/v3 v3.13.0
 	github.com/sigstore/cosign v1.13.1
 	github.com/spf13/cobra v1.6.1

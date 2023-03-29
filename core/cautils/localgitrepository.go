@@ -6,14 +6,12 @@ import (
 	"path"
 	"strings"
 
-	"github.com/go-git/go-billy/v5/osfs"
 	gitv5 "github.com/go-git/go-git/v5"
 	configv5 "github.com/go-git/go-git/v5/config"
 	plumbingv5 "github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/cache"
 
 	// "github.com/go-git/go-git/v5/go-billy/memfs"
-	// "github.com/go-git/go-git/v5/storage/memory"
 	"github.com/go-git/go-git/v5/storage/filesystem"
 	"github.com/kubescape/go-git-url/apis"
 )
@@ -29,16 +27,29 @@ var ErrWarnNotSupportedByBuild = errors.New(`git commits retrieval not supported
 
 func NewLocalGitRepository(path string) (*LocalGitRepository, error) {
 	// goGitRepo, err := gitv5.PlainOpenWithOptions(path, &gitv5.PlainOpenOptions{DetectDotGit: true})
-
-	// storage := memory.NewStorage()
-	storage := filesystem.NewStorage(
-		osfs.New(path),
-		cache.NewObjectLRUDefault(), // 96MB
-	)
-	_, wt, err := dotGitToOSFilesystems(path, true)
+	dot, wt, err := dotGitToOSFilesystems(path, true)
 	if err != nil {
 		return nil, fmt.Errorf("cannot open git repo on local FS: %w", err)
 	}
+	// memstorage := memory.NewStorage()
+	storage := filesystem.NewStorageWithOptions(
+		dot,
+		cache.NewObjectLRUDefault(), // 96MB
+		filesystem.Options{
+			// ExclusiveAccess means that the filesystem is not modified externally
+			// while the repo is open.
+			ExclusiveAccess: true,
+			// KeepDescriptors makes the file descriptors to be reused but they will
+			// need to be manually closed calling Close().
+			KeepDescriptors: true,
+			// MaxOpenDescriptors is the max number of file descriptors to keep
+			// open. If KeepDescriptors is true, all file descriptors will remain open.
+			// MaxOpenDescriptors: 1024,
+			// LargeObjectThreshold maximum object size (in bytes) that will be read in to memory.
+			// If left unset or set to 0 there is no limit
+			LargeObjectThreshold: 0,
+		},
+	)
 	goGitRepo, err := gitv5.Open(storage, wt)
 	if err != nil {
 		return nil, fmt.Errorf("cannot open git repo: %w", err)

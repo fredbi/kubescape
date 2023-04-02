@@ -3,6 +3,7 @@
 package cautils
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -68,7 +69,13 @@ func (g *gitRepository) GetFileLastCommit(filePath string) (*apis.Commit, error)
 					}
 				}
 
-				changes, err := prevTree.Diff(tree)
+				// changes, err := prevTree.Diff(tree) // ICI
+				changes, err := objectv5.DiffTreeWithOptions(context.Background(), prevTree, tree, &objectv5.DiffTreeOptions{
+					DetectRenames:    true,
+					RenameScore:      60,
+					RenameLimit:      0,
+					OnlyExactRenames: false,
+				})
 				if err != nil {
 					continue
 				}

@@ -26,12 +26,12 @@ type LocalGitRepository struct {
 var ErrWarnNotSupportedByBuild = errors.New(`git commits retrieval not supported by this build. Build with tag "gitenabled" to enable the full git scan feature`)
 
 func NewLocalGitRepository(path string) (*LocalGitRepository, error) {
+	// TODO(fred): plumbing to move to go-git
 	// goGitRepo, err := gitv5.PlainOpenWithOptions(path, &gitv5.PlainOpenOptions{DetectDotGit: true})
 	dot, wt, err := dotGitToOSFilesystems(path, true)
 	if err != nil {
 		return nil, fmt.Errorf("cannot open git repo on local FS: %w", err)
 	}
-	// memstorage := memory.NewStorage()
 	storage := filesystem.NewStorageWithOptions(
 		dot,
 		cache.NewObjectLRUDefault(), // 96MB

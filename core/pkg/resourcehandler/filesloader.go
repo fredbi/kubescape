@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/armosec/armoapi-go/armotypes"
 	"github.com/kubescape/k8s-interface/workloadinterface"
@@ -90,6 +91,11 @@ func (fileHandler *FileResourceHandler) GetResources(ctx context.Context, sessio
 }
 
 func getResourcesFromPath(ctx context.Context, path string) (map[string]reporthandling.Source, []workloadinterface.IMetadata, error) {
+	logger.L().Ctx(ctx).Debug("getResourcesFromPath")
+	t0 := time.Now()
+	defer func() {
+		logger.L().Ctx(ctx).Debug(fmt.Sprintf("getResourcesFromPath DONE: %v", time.Since(t0)))
+	}()
 	workloadIDToSource := make(map[string]reporthandling.Source, 0)
 	workloads := []workloadinterface.IMetadata{}
 
